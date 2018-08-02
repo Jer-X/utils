@@ -1,23 +1,26 @@
 /**
- * author: zerojer994@gmail.com
- * description: eventEmitter for Vue, automatically cancel component event listeners
- * useage:
+ * @Author: zerojer994@gmail.com
+ * @Date: 2018-08-02 22:55:56
+ * @Last Modified by: zerojer994@gmail.com
+ * @Last Modified time: 2018-08-02 23:03:07
+ * @Description: eventEmitter for Vue, automatically cancel component event listeners
+ * @usage:
  * import eventBus form 'xx/vueEventBus.js'
  * Vue.use(eventBus)
- * and then you can use this.$eventBusOn(event, func) to create event listeners
- * use this.$eventBusEmit(event, ...rest) to pass event, you can have all payload
+ * And then you can use this.$eventBusOn(event, func) to create event listeners
+ * Use this.$eventBusEmit(event, ...rest) to pass event, you can have all payload
+ * First of all you should write out all events will be mointored on the eventsRegistration option, which can help you manage your application events
  */
 
 const eventBus = {
-  // Write out which component submitted which events for subsequent addition
-  eventComponents: [
-    'HelloWorld'
+  // Write out which events will be monitored
+  eventsRegistration: [
+    'test'
   ],
   events: {},
   on (event, func, vue) {
-    const name = vue.$options.name
-    if (!this.eventComponents.includes(name)) {
-      throw new Error(`组件${name}监听的${event}事件未注册，请在vueEventBus.js里注册`)
+    if (!this.eventsRegistration.includes(event)) {
+      throw new Error(`监听的${event}事件未注册，请在vueEventBus.js里注册`)
     }
 
     const sign = {func, vue}
@@ -44,9 +47,9 @@ const eventBus = {
     })
   },
   init () {
-    this.eventComponents.forEach((item, index, arr) => {
+    this.eventsRegistration.forEach((item, index, arr) => {
       if (arr.indexOf(item) !== index) {
-        console.error(`含有重复的${item}组件定义`)
+        console.error(`含有重复的${item}事件定义`)
       }
     })
   }
