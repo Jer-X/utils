@@ -16,10 +16,12 @@ export default {
   data () {
     return {
       tableConfig: {
-        global: {
+        table: {
           selection: true,
+          border: true
+        },
+        global: {
           align: 'center',
-          border: true,
           showOverflowTooltip: true
         },
         setting: [
