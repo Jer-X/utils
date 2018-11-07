@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="imgPreviewer.js"></script>
+</head>
+<body>
+  <img id="image" src="https://i0.hdslb.com/bfs/archive/78f69af248e1812229082a52bd2af06f2b969d26.jpg" alt="image">
+  <script>
+    window.onload = function() {
+      let images = [
+        'https://i0.hdslb.com/bfs/sycp/tmaterial/201811/3d52564e95bfd780ec45a09060d79b9d.jpg',
+        'https://i0.hdslb.com/bfs/archive/78f69af248e1812229082a52bd2af06f2b969d26.jpg'
+      ]
+      if (initPreviewer) {
+        let img = document.querySelector('#image')
+        img.addEventListener('click', e => {
+          e.stopPropagation()
+          initPreviewer(e, images, false)
+        })
+      } 
+    }
+  </script>
+</body>
+</html>
