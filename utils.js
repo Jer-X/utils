@@ -15,12 +15,12 @@
  */
 const arrayFuzzySearch = (arr, query, name) => {
     // if has name attributes, arr will be defaulted to an array of objects, will match the name attribute in the array object
-    let queryType = typeof(query)
+    let queryType = typeof (query)
     let reg = new RegExp(`.*?${query}.*?`, 'i')
     if (name) {
-        return arr.filter(item => typeof(item.name) === queryType && reg.test(item[name]))
+        return arr.filter(item => typeof (item.name) === queryType && reg.test(item[name]))
     }
-    return arr.filter(item => typeof(item) === queryType && reg.test(item))
+    return arr.filter(item => typeof (item) === queryType && reg.test(item))
 }
 
 /**
@@ -53,7 +53,11 @@ const browserVendor = () => {
     let isIE = window.ActiveXObject !== undefined && navigator.appName === 'Microsofe Internet Explorer' || /trident/gi.test(ua);
     let isWebkit = /webkit/gi.test(ua) && window.chrome;
     let isFF = /gecko/gi.test(ua) && /firefox/gi.test(ua);
-    return {isIE, isWebkit, isFF}
+    return {
+        isIE,
+        isWebkit,
+        isFF
+    }
 }
 
 /**
@@ -61,8 +65,8 @@ const browserVendor = () => {
  * @param Any the value you want to be checked
  * @returns Boolean the value is or not the type
  */
-const checkType = {};
-;(function() {
+const checkType = {};;
+(function () {
     let typeArray = ['String', 'Array', 'Number', 'Date', 'Object'];
     typeArray.forEach(item => {
         checkType[`is${item}`] = (obj) => {
@@ -75,11 +79,9 @@ const getScrollTop = () => {
     let scrollPos
     if (window.pageYOffset) {
         scrollPos = window.pageYOffset;
-    }
-    else if (document.compatMode && document.compatMode != 'BackCompat') {
+    } else if (document.compatMode && document.compatMode != 'BackCompat') {
         scrollPos = document.documentElement.scrollTop;
-    }
-    else if (document.body) {
+    } else if (document.body) {
         scrollPos = document.body.scrollTop;
     }
     return scrollPos;
@@ -89,11 +91,9 @@ const getScrollLeft = () => {
     let scrollPos
     if (window.pageXOffset) {
         scrollPos = window.pageXOffset;
-    }
-    else if (document.compatMode && document.compatMode != 'BackCompat') {
+    } else if (document.compatMode && document.compatMode != 'BackCompat') {
         scrollPos = document.documentElement.scrollLeft;
-    }
-    else if (document.body) {
+    } else if (document.body) {
         scrollPos = document.body.scrollLeft;
     }
     return scrollPos;
@@ -101,10 +101,16 @@ const getScrollLeft = () => {
 
 const getDomPos = (element) => {
     let sizeObj = element.getBoundingClientRect();
-    let bodyOffset = {top: getScrollTop(), left: getScrollLeft()};
+    let bodyOffset = {
+        top: getScrollTop(),
+        left: getScrollLeft()
+    };
     let offsetTop = sizeObj.top + bodyOffset.top;
     let offsetLeft = sizeObj.left + bodyOffset.left;
-    return {offsetTop, offsetLeft}
+    return {
+        offsetTop,
+        offsetLeft
+    }
 }
 
 const canvasToImg = (canvas, imgType = 'type') => {
@@ -156,7 +162,7 @@ const copyObj = (obj) => {
     }
     let keys = Object.keys(obj);
     keys.forEach(item => {
-        if (obj[item] && typeof(obj[item]) === 'object') {
+        if (obj[item] && typeof (obj[item]) === 'object') {
             newObj[item] = copyObj(obj[item]);
         } else {
             newObj[item] = obj[item];
@@ -189,7 +195,7 @@ const downloadFile = (url, fileName) => {
 
         // dispatching click event
         if (document.createEvent) {
-            let e  = document.createEvent('MouseEvents');
+            let e = document.createEvent('MouseEvents');
             e.initEvent('click', true, true);
             link.dispatchEvent(e);
             return true;
@@ -213,7 +219,7 @@ const getLocation = () => {
 }
 
 const getPercent = (num) => {
-    if (typeof(num) !== 'number') {
+    if (typeof (num) !== 'number') {
         throw new Error('请输入数字');
     }
     return num.toFixed(2) * 100 + '%';
@@ -222,4 +228,74 @@ const getPercent = (num) => {
 const getDoubleDigit = (num) => {
     num = num.toString()
     return num.charAt(1) ? num : `0${num}`
+}
+
+updateChildren(parentElm, oldCh, newCh) {
+    let oldStartIdx = 0,
+        newStartIdx = 0
+    let oldEndIdx = oldCh.length - 1
+    let oldStartVnode = oldCh[0]
+    let oldEndVnode = oldCh[oldEndIdx]
+    let newEndIdx = newCh.length - 1
+    let newStartVnode = newCh[0]
+    let newEndVnode = newCh[newEndIdx]
+    let oldKeyToIdx
+    let idxInOld
+    let elmToMove
+    let before
+    while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
+        if (oldStartVnode == null) { //对于vnode.key的比较，会把oldVnode = null
+            oldStartVnode = oldCh[++oldStartIdx]
+        } else if (oldEndVnode == null) {
+            oldEndVnode = oldCh[--oldEndIdx]
+        } else if (newStartVnode == null) {
+            newStartVnode = newCh[++newStartIdx]
+        } else if (newEndVnode == null) {
+            newEndVnode = newCh[--newEndIdx]
+        } else if (sameVnode(oldStartVnode, newStartVnode)) {
+            patchVnode(oldStartVnode, newStartVnode)
+            oldStartVnode = oldCh[++oldStartIdx]
+            newStartVnode = newCh[++newStartIdx]
+        } else if (sameVnode(oldEndVnode, newEndVnode)) {
+            patchVnode(oldEndVnode, newEndVnode)
+            oldEndVnode = oldCh[--oldEndIdx]
+            newEndVnode = newCh[--newEndIdx]
+        } else if (sameVnode(oldStartVnode, newEndVnode)) {
+            patchVnode(oldStartVnode, newEndVnode)
+            api.insertBefore(parentElm, oldStartVnode.el, api.nextSibling(oldEndVnode.el))
+            oldStartVnode = oldCh[++oldStartIdx]
+            newEndVnode = newCh[--newEndIdx]
+        } else if (sameVnode(oldEndVnode, newStartVnode)) {
+            patchVnode(oldEndVnode, newStartVnode)
+            api.insertBefore(parentElm, oldEndVnode.el, oldStartVnode.el)
+            oldEndVnode = oldCh[--oldEndIdx]
+            newStartVnode = newCh[++newStartIdx]
+        } else {
+            // 使用key时的比较
+            if (oldKeyToIdx === undefined) {
+                oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx) // 有key生成index表
+            }
+            idxInOld = oldKeyToIdx[newStartVnode.key]
+            if (!idxInOld) {
+                api.insertBefore(parentElm, createEle(newStartVnode).el, oldStartVnode.el)
+                newStartVnode = newCh[++newStartIdx]
+            } else {
+                elmToMove = oldCh[idxInOld]
+                if (elmToMove.sel !== newStartVnode.sel) {
+                    api.insertBefore(parentElm, createEle(newStartVnode).el, oldStartVnode.el)
+                } else {
+                    patchVnode(elmToMove, newStartVnode)
+                    oldCh[idxInOld] = null
+                    api.insertBefore(parentElm, elmToMove.el, oldStartVnode.el)
+                }
+                newStartVnode = newCh[++newStartIdx]
+            }
+        }
+    }
+    if (oldStartIdx > oldEndIdx) {
+        before = newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].el
+        addVnodes(parentElm, before, newCh, newStartIdx, newEndIdx)
+    } else if (newStartIdx > newEndIdx) {
+        removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx)
+    }
 }
