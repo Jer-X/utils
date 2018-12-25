@@ -2,7 +2,7 @@
  * @Author: zerojer994@gmail.com
  * @Date: 2018-08-03 10:15:26
  * @Last Modified by: zerojer994@gmail.com
- * @Last Modified time: 2018-08-03 11:37:51
+ * @Last Modified time: 2018-12-25 23:51:53
  * @Description: change english price type to chinese price
  */
 ;(function(e, undefined) {
@@ -54,7 +54,7 @@
         var tmp_u = ''
         integetArr.forEach(function (e) { // 遍历已截取整数数组
             start = ch_u.length - e.length + 1 // 判断单位的截取长度，因为个位数没有单位，所以开始位置为单位字符长度减去字符串长度+1
-            end = ch_u.substr(start) // 截取单位字符
+            tmp_u = ch_u.substr(start) // 截取单位字符
             tmp = ''
             for (var j = 0; j < e.length; j++) { // 遍历字符串
                 tmp += j !== tmp_u.length
@@ -70,6 +70,7 @@
         len = strArr.length
         var tmp_bu = ''
         strArr = strArr.map(function(e, index) { // 遍历已经替换为中文字符的数组
+            if (!e) return ''
             start = ch_bu.length - strArr.length + 1 // 判断大单位截取长度，因为万以下自带单位，所以开始位置为大单位字符串长度减去当前中文字符数组长度+1
             tmp_bu = ch_bu.substr(start) // 截取大单位
             e = index !== tmp_bu.length ? e + tmp_bu.charAt(index) : e // 根据判断索引是否等于大单位长度来决定当前中文字符是否需要增加大单位
@@ -78,17 +79,73 @@
 
         re = strArr.join('') // 合并数组为字符串
         re = re.replace(/零{1,}/g, '零') // 把多个零替换为一个零
+        re += '元'
 
         tmp = ''
 
         // 小数部分
         for (var k = 0; k < decimalStr.length; k++) { // 遍历小数部分
-            tmp += decimalStr.charAt(k) !== '0' ? ch.charAt(decimalStr.charAt(k)) + ch_su.charAt(i) : '' // 根据当前字符是否为0来决定是否需要替换为中文字符
+            tmp += decimalStr.charAt(k) !== '0' ? ch.charAt(decimalStr.charAt(k)) + ch_su.charAt(k) : '' // 根据当前字符是否为0来决定是否需要替换为中文字符
         }
 
         re = re + tmp // 把整数部分和小数部分合并
 
         return re // 返回结果
+    }
+
+    function changeToChinesePriceES6 (num, decimalLength) {
+        let ch = '零壹贰叁肆务陆柒捌玖' // 单个文字
+        let ch_u = '仟佰拾' // 四个为一组单位
+        let ch_bu = '垓京兆亿万' // 万以上单位
+        let ch_su = '角分毫厘' // 小数单位
+
+        if (!checkType(num)) {
+            throw new Error('params is not Number')
+            return
+        }
+
+        let numStr = num.toFixed(decimalLength)
+        let integetStr = numStr.split('.')[0]
+        let decimalStr = numStr.split('.')[1]
+
+        if (integetStr.length === 1) {
+            return ch.charAt(integetStr)
+        }
+
+        let remainder = integetStr.length % 4
+        let times = Math.ceil(integetStr.length / 4)
+        let integetArr = []
+        for(let i = 0; i < times; i++) {
+            let start = i ? remainder ? remainder + 4 * (i - 1) : remainder + 4 * i : 0
+            let end = !i && remainder ? remainder : 4
+            integetArr.push(integetStr.substr(start, end))
+        }
+
+        let strArr = integetArr.reduce((arr, item) => {
+            let start = ch_u.length - item.length + 1
+            let tmp_u = ch_u.substr(start)
+            let tmp = item.split('').map((item, index) => {
+                return `${ch.charAt(item)}${index !== tmp_u.length && item !== '0' ? `${tmp_u.charAt(index)}` : ''}`
+            }).join('')
+            arr.push(tmp.replace(/零{1,}$/, ''))
+            return arr
+        }, [])
+        strArr = strArr.map((item, index) => {
+            if (!item) return ''
+            let start = ch_bu.length - times + 1
+            let tmp_bu = ch_bu.substr(start)
+            item = `${item}${index !== tmp_bu.length ? tmp_bu.charAt(index) : ''}`
+            return item
+        })
+
+        let integet = `${strArr.join('').replace(/零{1,}/, '零')}元`
+        let decimal = decimalStr
+            ? decimalStr.split('').map((item, index) => {
+                return `${+item ? `${ch.charAt(item)}${ch_su.charAt(index)}` : ''}`
+            }).join('')
+            : ''
+
+        return `${integet}${decimal}`
     }
 
     function checkType (val) {
@@ -111,6 +168,7 @@
     }
 
     ZERO.toChinese = changeToChinesePrice
+    ZERO.toChineseES6 = changeToChinesePriceES6
 
     e.Zero = e.$zero = ZERO
 })(window);
